@@ -17,7 +17,7 @@ def create_new_post():
             line = input()
             content_lines.append(line)
     except EOFError:
-        passMy Simple Blog
+        pass
     content = '\n'.join(content_lines).strip()
 
     if not content:
@@ -54,6 +54,7 @@ def create_new_post():
             <p>{content.replace('\n', '</p>\n            <p>')}</p>
         </article>
     </main>
+    <script src="script.js"></script>
 </body>
 </html>"""
 
