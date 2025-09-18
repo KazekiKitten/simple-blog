@@ -120,4 +120,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Pagination logic - optimized for speed
+    const articles = document.querySelectorAll('main article');
+    const itemsPerPage = 5;
+    let currentPage = 1;
+    const totalPages = Math.ceil(articles.length / itemsPerPage);
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageInfo = document.getElementById('page-info');
+
+    function showPage(page) {
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        for (let i = 0; i < articles.length; i++) {
+            articles[i].style.display = (i >= start && i < end) ? 'block' : 'none';
+        }
+        updatePagination();
+    }
+
+    function updatePagination() {
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    // Initialize pagination
+    showPage(currentPage);
 });
