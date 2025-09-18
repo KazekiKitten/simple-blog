@@ -128,9 +128,6 @@ def create_new_post():
 <body>
     <header>
         <h1><a href="index.html">Cat-logs</a></h1>
-        <nav>
-            <a href="index.html">Home</a>
-        </nav>
     </header>
     <main>
         <article>
