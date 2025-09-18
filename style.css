@@ -32,19 +32,25 @@ h2 {
 
 p {
   margin: 0 0 1em;
+
 }
 
 a {
   color: #87ceeb;
-  text-decoration: none;
+    text-decoration: none;
 }
 
 a:hover {
   color: #add8e6;
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 main {
   max-width: 65ch; 
   margin: 0 auto;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
 }
