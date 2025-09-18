@@ -17,7 +17,7 @@ def create_new_post():
             line = input()
             content_lines.append(line)
     except EOFError:
-        pass
+        passMy Simple Blog
     content = '\n'.join(content_lines).strip()
 
     if not content:
@@ -40,12 +40,12 @@ def create_new_post():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} - My Simple Blog</title>
+    <title>{title} - Cat-logs</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1><a href="index.html">My Simple Blog</a></h1>
+        <h1><a href="index.html">Cat-logs</a></h1>
     </header>
     <main>
         <article>
@@ -54,7 +54,6 @@ def create_new_post():
             <p>{content.replace('\n', '</p>\n            <p>')}</p>
         </article>
     </main>
-    <script src="script.js"></script>
 </body>
 </html>"""
 
