@@ -13,6 +13,25 @@ def create_new_post():
         return
 
     print("Enter post content in Markdown (press Ctrl+D or Ctrl+Z to finish):")
+   print("""\nMarkdown hints:
+  # Heading 1
+  ## Heading 2
+  ### Heading 3
+
+  **bold text** or *italic text*
+  > Blockquote
+
+  [Link text](https://example.com)
+  ![Alt text](path/to/image.jpg)
+
+  - Bullet list item
+  1. Numbered list item
+
+  ```python
+  print("Code block with syntax highlighting")
+
+""")
+
     content_lines = []
     try:
         while True:
