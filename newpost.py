@@ -86,7 +86,10 @@ def create_new_post():
     try:
         subprocess.run(['git', 'add', '.'], check=True)
         subprocess.run(['git', 'commit', '-m', f'Add new post: {title}'], check=True)
-        subprocess.run(['git', 'push'], check=True)
+        # Get current branch
+        result = subprocess.run(['git', 'branch', '--show-current'], capture_output=True, text=True, check=True)
+        branch = result.stdout.strip()
+        subprocess.run(['git', 'push', '--set-upstream', 'origin', branch], check=True)
         print("Pushed changes to GitHub")
     except subprocess.CalledProcessError as e:
         print(f"Git command failed: {e}")
