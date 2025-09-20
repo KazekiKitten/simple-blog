@@ -124,12 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     clearOldCache();
 
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(prefetchAllBlogLinks, { timeout: 2000 });
-    } else {
-        setTimeout(prefetchAllBlogLinks, 1000);
-    }
-
+    // Removed prefetchAllBlogLinks to reduce initial load time
     setupLazyPrefetch();
     setupHoverPrefetch();
 
