@@ -128,19 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupLazyPrefetch();
     setupHoverPrefetch();
 
-    function formatDate(isoString) {
-        const date = new Date(isoString);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
     const originalArticles = Array.from(document.querySelectorAll('main article'));
-    originalArticles.forEach(article => {
-        const timestamp = article.getAttribute('data-timestamp');
-        const dateElement = article.querySelector('.post-date');
-        if (dateElement && timestamp) {
-            dateElement.textContent = formatDate(timestamp);
-        }
-    });
     let sortedArticles = [...originalArticles];
     const searchBar = document.getElementById('search-bar');
     let isSearching = false;
