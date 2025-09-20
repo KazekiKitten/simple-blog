@@ -18,6 +18,25 @@ h1 {
   font-size: 2em;
   font-weight: 600;
   letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+#search-bar {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #87ceeb;
+  background-color: #1e1e1e;
+  color: #f4f4f4;
+  border-radius: 4px;
+}
+
+#search-bar:focus {
+  outline: none;
+  border-color: #add8e6;
 }
 
 article {
@@ -28,6 +47,16 @@ h2 {
   margin-bottom: 10px;
   font-size: 1.75em;
   font-weight: 500;
+}
+
+.category {
+  display: inline-block;
+  font-size: 0.875em;
+  color: #add8e6;
+  background-color: #333;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-bottom: 5px;
 }
 
 p {

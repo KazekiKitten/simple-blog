@@ -12,6 +12,11 @@ def create_new_post():
         print("Title cannot be empty.")
         return
 
+    category = input("Enter post category: ").strip()
+    if not category:
+        print("Category cannot be empty.")
+        return
+
     print("Enter post content in Markdown (press Ctrl+D or Ctrl+Z to finish):")
     content_lines = []
     try:
@@ -79,7 +84,8 @@ def create_new_post():
     summary = text_summary[:100] + "..." if len(text_summary) > 100 else text_summary
 
     # Generate link HTML for index
-    link_html = f"""        <article>
+    link_html = f"""        <article data-category="{category.lower()}">
+            <span class="category">{category}</span>
             <h2><a href="{filename}">{title}</a></h2>
             <p>{summary}</p>
         </article>"""

@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageInfo = document.getElementById('page-info');
 
     function showPage(page) {
+        if (isSearching) return; // Don't paginate when searching
         const start = (page - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         for (let i = 0; i < articles.length; i++) {
@@ -158,6 +159,35 @@ document.addEventListener('DOMContentLoaded', function() {
             showPage(currentPage);
         }
     });
+
+    // Search functionality
+    const searchBar = document.getElementById('search-bar');
+    let isSearching = false;
+
+    function performSearch() {
+        const query = searchBar.value.toLowerCase().trim();
+        const articles = document.querySelectorAll('main article');
+
+        if (query === '') {
+            isSearching = false;
+            showPage(currentPage);
+            document.getElementById('pagination').style.display = 'flex';
+            return;
+        }
+
+        isSearching = true;
+        document.getElementById('pagination').style.display = 'none';
+
+        articles.forEach(article => {
+            const h2 = article.querySelector('h2').textContent.toLowerCase();
+            const p = article.querySelector('p').textContent.toLowerCase();
+            const category = article.getAttribute('data-category').toLowerCase();
+            const matches = h2.includes(query) || p.includes(query) || category.includes(query);
+            article.style.display = matches ? 'block' : 'none';
+        });
+    }
+
+    searchBar.addEventListener('input', performSearch);
 
     // Initialize pagination
     showPage(currentPage);
