@@ -21,11 +21,16 @@ h1 {
   margin-bottom: 10px;
 }
 
+#controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
 #search-bar {
-  display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+  flex: 1;
+  max-width: 300px;
   padding: 8px 12px;
   font-size: 16px;
   border: 1px solid #87ceeb;
@@ -35,6 +40,20 @@ h1 {
 }
 
 #search-bar:focus {
+  outline: none;
+  border-color: #add8e6;
+}
+
+#sort-select {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #87ceeb;
+  background-color: #1e1e1e;
+  color: #f4f4f4;
+  border-radius: 4px;
+}
+
+#sort-select:focus {
   outline: none;
   border-color: #add8e6;
 }
@@ -50,12 +69,8 @@ h2 {
 }
 
 .category {
-  display: inline-block;
   font-size: 0.875em;
   color: #add8e6;
-  background-color: #333;
-  padding: 2px 6px;
-  border-radius: 3px;
   margin-bottom: 5px;
 }
 

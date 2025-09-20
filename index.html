@@ -9,7 +9,14 @@
 <body>
     <header>
         <h1>Cat-logs</h1>
-        <input type="text" id="search-bar" placeholder="Search posts..." />
+        <div id="controls">
+            <input type="text" id="search-bar" placeholder="Search posts..." />
+            <select id="sort-select">
+                <option value="default">Default</option>
+                <option value="alpha">Alphabetical</option>
+                <option value="category">By Category</option>
+            </select>
+        </div>
     </header>
     <main>
         <article data-category="personal">

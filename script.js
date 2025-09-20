@@ -122,10 +122,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Pagination logic - optimized for speed
-    const articles = document.querySelectorAll('main article');
+    let articles = sortedArticles;
     const itemsPerPage = 5;
     let currentPage = 1;
-    const totalPages = Math.ceil(articles.length / itemsPerPage);
+    let totalPages = Math.ceil(articles.length / itemsPerPage);
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const pageInfo = document.getElementById('page-info');
@@ -141,9 +141,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePagination() {
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages;
+        if (totalPages > 1) {
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        } else {
+            pageInfo.textContent = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+        }
     }
 
     prevBtn.addEventListener('click', () => {
@@ -163,10 +169,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Search functionality
     const searchBar = document.getElementById('search-bar');
     let isSearching = false;
+    const originalArticles = Array.from(document.querySelectorAll('main article'));
+    let sortedArticles = [...originalArticles];
 
     function performSearch() {
         const query = searchBar.value.toLowerCase().trim();
-        const articles = document.querySelectorAll('main article');
+        const articles = sortedArticles;
 
         if (query === '') {
             isSearching = false;
@@ -187,7 +195,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function sortArticles() {
+        const sortValue = document.getElementById('sort-select').value;
+        const main = document.querySelector('main');
+
+        if (sortValue === 'default') {
+            sortedArticles = [...originalArticles];
+        } else if (sortValue === 'alpha') {
+            sortedArticles = [...originalArticles].sort((a, b) => {
+                const aTitle = a.querySelector('h2').textContent.toLowerCase();
+                const bTitle = b.querySelector('h2').textContent.toLowerCase();
+                return aTitle.localeCompare(bTitle);
+            });
+        } else if (sortValue === 'category') {
+            sortedArticles = [...originalArticles].sort((a, b) => {
+                const aCat = a.getAttribute('data-category').toLowerCase();
+                const bCat = b.getAttribute('data-category').toLowerCase();
+                return aCat.localeCompare(bCat);
+            });
+        }
+
+        // Re-append sorted articles
+        sortedArticles.forEach(article => main.appendChild(article));
+
+        // Update articles and totalPages
+        articles = sortedArticles;
+        totalPages = Math.ceil(articles.length / itemsPerPage);
+
+        // Reset to first page
+        currentPage = 1;
+        showPage(currentPage);
+    }
+
     searchBar.addEventListener('input', performSearch);
+    document.getElementById('sort-select').addEventListener('change', sortArticles);
 
     // Initialize pagination
     showPage(currentPage);
