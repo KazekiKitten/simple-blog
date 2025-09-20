@@ -83,8 +83,11 @@ def create_new_post():
     text_summary = soup.get_text()
     summary = text_summary[:100] + "..." if len(text_summary) > 100 else text_summary
 
+    # Generate timestamp
+    timestamp = datetime.now().isoformat() + 'Z'
+
     # Generate link HTML for index
-    link_html = f"""        <article data-category="{category.lower()}">
+    link_html = f"""        <article data-category="{category.lower()}" data-timestamp="{timestamp}">
             <span class="category">{category}</span>
             <h2><a href="{filename}">{title}</a></h2>
             <p>{summary}</p>

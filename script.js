@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const CACHE_KEY = 'blog_prefetch_cache';
-    const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in ms for aggressive caching
+    const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-    // Load cache from localStorage
     function loadCache() {
         try {
             const stored = localStorage.getItem(CACHE_KEY);
@@ -12,17 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Save cache to localStorage
     function saveCache(cache) {
         try {
             localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
         } catch (e) {
-            // localStorage might be full, clear old entries
-            clearOldCache();
+            clearOldCache(); 
         }
     }
 
-    // Clear expired cache entries
     function clearOldCache() {
         const cache = loadCache();
         const now = Date.now();
@@ -35,9 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        if (hasChanges) {
-            saveCache(cache);
-        }
+        if (hasChanges) saveCache(cache);
     }
 
     function isBlogLink(href) {
@@ -46,16 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function isLowBandwidth() {
         if ('connection' in navigator) {
-            const connection = navigator.connection;
-            return connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g';
+            const c = navigator.connection;
+            return c.effectiveType === 'slow-2g' || c.effectiveType === '2g';
         }
         return false;
     }
 
     function isCached(href, cache) {
         if (cache[href]) {
-            const entry = cache[href];
-            return Date.now() - entry.timestamp < CACHE_DURATION;
+            return Date.now() - cache[href].timestamp < CACHE_DURATION;
         }
         return false;
     }
@@ -63,9 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function prefetchHTML(href, cache) {
         try {
             const response = await fetch(href, {
-                headers: {
-                    'Cache-Control': 'max-age=3600', // 1 hour browser cache
-                }
+                headers: { 'Cache-Control': 'max-age=3600' }
             });
             if (response.ok) {
                 const content = await response.text();
@@ -77,10 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Aggressive prefetch: prefetch all blog links on page load
     function prefetchAllBlogLinks() {
         if (isLowBandwidth()) return;
-
         const cache = loadCache();
         const links = document.querySelectorAll('a[href]');
         const prefetchPromises = [];
@@ -92,36 +81,75 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Limit concurrent prefetches to avoid overwhelming
         const batchSize = 3;
         for (let i = 0; i < prefetchPromises.length; i += batchSize) {
             setTimeout(() => {
                 Promise.all(prefetchPromises.slice(i, i + batchSize));
-            }, i * 100); // Stagger requests
+            }, i * 100);
         }
     }
 
-    // Clear old cache entries on load
+    function setupLazyPrefetch() {
+        if (isLowBandwidth()) return;
+        const cache = loadCache();
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const href = entry.target.getAttribute('href');
+                    if (isBlogLink(href) && !isCached(href, cache)) {
+                        prefetchHTML(href, cache);
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        document.querySelectorAll('a[href]').forEach(link => observer.observe(link));
+    }
+
+    function setupHoverPrefetch() {
+        const links = document.querySelectorAll('a[href]');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                const href = this.getAttribute('href');
+                if (isBlogLink(href) && !isLowBandwidth()) {
+                    const cache = loadCache();
+                    if (!isCached(href, cache)) {
+                        prefetchHTML(href, cache);
+                    }
+                }
+            });
+        });
+    }
+
     clearOldCache();
 
-    // Start aggressive prefetching
-    prefetchAllBlogLinks();
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(prefetchAllBlogLinks, { timeout: 2000 });
+    } else {
+        setTimeout(prefetchAllBlogLinks, 1000);
+    }
 
-    // Also prefetch on hover as backup
-    const links = document.querySelectorAll('a[href]');
-    links.forEach(link => {
-        link.addEventListener('mouseenter', function() {
-            const href = this.getAttribute('href');
-            if (isBlogLink(href) && !isLowBandwidth()) {
-                const cache = loadCache();
-                if (!isCached(href, cache)) {
-                    prefetchHTML(href, cache);
-                }
-            }
-        });
+    setupLazyPrefetch();
+    setupHoverPrefetch();
+
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    const originalArticles = Array.from(document.querySelectorAll('main article'));
+    originalArticles.forEach(article => {
+        const timestamp = article.getAttribute('data-timestamp');
+        const dateElement = article.querySelector('.post-date');
+        if (dateElement && timestamp) {
+            dateElement.textContent = formatDate(timestamp);
+        }
     });
+    let sortedArticles = [...originalArticles];
+    const searchBar = document.getElementById('search-bar');
+    let isSearching = false;
 
-    // Pagination logic - optimized for speed
     let articles = sortedArticles;
     const itemsPerPage = 5;
     let currentPage = 1;
@@ -131,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageInfo = document.getElementById('page-info');
 
     function showPage(page) {
-        if (isSearching) return; // Don't paginate when searching
+        if (isSearching) return;
         const start = (page - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         for (let i = 0; i < articles.length; i++) {
@@ -166,12 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Search functionality
-    const searchBar = document.getElementById('search-bar');
-    let isSearching = false;
-    const originalArticles = Array.from(document.querySelectorAll('main article'));
-    let sortedArticles = [...originalArticles];
-
     function performSearch() {
         const query = searchBar.value.toLowerCase().trim();
         const articles = sortedArticles;
@@ -199,30 +221,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const sortValue = document.getElementById('sort-select').value;
         const main = document.querySelector('main');
 
-        if (sortValue === 'default') {
-            sortedArticles = [...originalArticles];
+        if (sortValue === 'newest') {
+            sortedArticles = [...originalArticles].sort((a, b) =>
+                new Date(b.getAttribute('data-timestamp')) - new Date(a.getAttribute('data-timestamp'))
+            );
+        } else if (sortValue === 'oldest') {
+            sortedArticles = [...originalArticles].sort((a, b) =>
+                new Date(a.getAttribute('data-timestamp')) - new Date(b.getAttribute('data-timestamp'))
+            );
         } else if (sortValue === 'alpha') {
-            sortedArticles = [...originalArticles].sort((a, b) => {
-                const aTitle = a.querySelector('h2').textContent.toLowerCase();
-                const bTitle = b.querySelector('h2').textContent.toLowerCase();
-                return aTitle.localeCompare(bTitle);
-            });
+            sortedArticles = [...originalArticles].sort((a, b) =>
+                a.querySelector('h2').textContent.toLowerCase().localeCompare(
+                    b.querySelector('h2').textContent.toLowerCase()
+                )
+            );
         } else if (sortValue === 'category') {
-            sortedArticles = [...originalArticles].sort((a, b) => {
-                const aCat = a.getAttribute('data-category').toLowerCase();
-                const bCat = b.getAttribute('data-category').toLowerCase();
-                return aCat.localeCompare(bCat);
-            });
+            sortedArticles = [...originalArticles].sort((a, b) =>
+                a.getAttribute('data-category').toLowerCase().localeCompare(
+                    b.getAttribute('data-category').toLowerCase()
+                )
+            );
         }
 
-        // Re-append sorted articles
         sortedArticles.forEach(article => main.appendChild(article));
-
-        // Update articles and totalPages
         articles = sortedArticles;
         totalPages = Math.ceil(articles.length / itemsPerPage);
-
-        // Reset to first page
         currentPage = 1;
         showPage(currentPage);
     }
@@ -230,6 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     searchBar.addEventListener('input', performSearch);
     document.getElementById('sort-select').addEventListener('change', sortArticles);
 
-    // Initialize pagination
+    sortArticles();
     showPage(currentPage);
 });
