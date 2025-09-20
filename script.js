@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePagination() {
+        if (!pageInfo || !prevBtn || !nextBtn) return;
         if (totalPages > 1) {
             pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
             prevBtn.disabled = currentPage === 1;
@@ -163,33 +164,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    prevBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            showPage(currentPage);
-        }
-    });
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+    }
 
-    nextBtn.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            showPage(currentPage);
-        }
-    });
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+    }
 
     function performSearch() {
         const query = searchBar.value.toLowerCase().trim();
         const articles = sortedArticles;
+        const pagination = document.getElementById('pagination');
 
         if (query === '') {
             isSearching = false;
             showPage(currentPage);
-            document.getElementById('pagination').style.display = 'flex';
+            if (pagination) pagination.style.display = 'flex';
             return;
         }
 
         isSearching = true;
-        document.getElementById('pagination').style.display = 'none';
+        if (pagination) pagination.style.display = 'none';
 
         articles.forEach(article => {
             const h2 = article.querySelector('h2').textContent.toLowerCase();
@@ -233,8 +239,13 @@ document.addEventListener('DOMContentLoaded', function() {
         showPage(currentPage);
     }
 
-    searchBar.addEventListener('input', performSearch);
-    document.getElementById('sort-select').addEventListener('change', sortArticles);
+    if (searchBar) {
+        searchBar.addEventListener('input', performSearch);
+    }
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', sortArticles);
+    }
 
     sortArticles();
     showPage(currentPage);
