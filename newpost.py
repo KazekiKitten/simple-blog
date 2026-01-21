@@ -3,28 +3,47 @@ import re
 import subprocess
 from datetime import datetime
 import markdown
-from bs4 import BeautifulSoup  # for extracting plain text summaries
+from bs4 import BeautifulSoup
+import sys
+
+# Try to import readline for better line editing (cross-platform)
+try:
+    import readline
+except ImportError:
+    pass  # readline not available on Windows, but still works
+
+
+def get_input_with_editing(prompt):
+    """Get input with better arrow key support."""
+    try:
+        return input(prompt)
+    except KeyboardInterrupt:
+        print("\nAborted.")
+        sys.exit(0)
 
 
 def create_new_post():
-    title = input("Enter post title: ").strip()
+    title = get_input_with_editing("Enter post title: ").strip()
     if not title:
         print("Title cannot be empty.")
         return
 
-    category = input("Enter post category: ").strip()
+    category = get_input_with_editing("Enter post category: ").strip()
     if not category:
         print("Category cannot be empty.")
         return
 
-    print("Enter post content in Markdown (press Ctrl+D or Ctrl+Z to finish):")
+    print("Enter post content in Markdown (press Ctrl+D on Linux/Mac or Ctrl+Z on Windows to finish):")
+    print("(You can now use arrow keys, backspace, and other editing keys)")
+
     content_lines = []
     try:
         while True:
-            line = input()
+            line = get_input_with_editing("")
             content_lines.append(line)
     except EOFError:
         pass
+
     content = '\n'.join(content_lines).strip()
 
     if not content:
@@ -37,7 +56,7 @@ def create_new_post():
 
     # Check if file exists
     if os.path.exists(filename):
-        overwrite = input(f"File {filename} already exists. Overwrite? (y/n): ").lower()
+        overwrite = get_input_with_editing(f"File {filename} already exists. Overwrite? (y/n): ").lower()
         if overwrite != 'y':
             print("Aborted.")
             return
